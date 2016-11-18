@@ -4,14 +4,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+require("./db");
 // 加载路由文件   routes 文件夹专门存放路由文件
 // 这里的index实际上就是index里暴露出来的
 var index = require('./routes/index');
 var users = require('./routes/users');
 var article = require('./routes/article');
-
 var app = express();
+
+
 
 //加载模板
 // view engine setup
