@@ -7,6 +7,18 @@ var auth = require("../use/autoauth.js");
 var models = require("../db/index.js");
 var utils = require("../utils");
 var markdown = require('markdown').markdown;
+var multer = require("multer");
+var path = require('path');
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, '../public/images')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now()+'.'+file.mimetype.slice(file.mimetype.indexOf('/')+1))
+    }
+});
+var upload = multer({ storage:storage});
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -42,7 +54,11 @@ router.get('/view', function(req, res, next) {
 //    });
 //});
 
-router.post('/add',auth.checkNotLogin, function (req, res) {
+router.post('/add',auth.checkNotLogin, upload.single('img'),function (req, res) {
+    req.body.user = req.session.user._id;
+    if(req.file){
+        req.body.img = path.join('/images',req.file.filename);
+    }
     var _id = req.body._id;
     if(_id){
         var set = {title:req.body.title,content:req.body.content};

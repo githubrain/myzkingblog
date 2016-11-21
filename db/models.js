@@ -17,6 +17,7 @@ Article: { //设置文章的数据模型
     user:{type:ObjectId,ref:'User'}, //用户
     title: String, //标题
     content: String, //内容
+    img:String,
     createAt:{type: Date, default: Date.now}// 创建时间
 }
 };
