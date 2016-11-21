@@ -1,6 +1,76 @@
 <% include include/header.ejs%>
+<style>
+    #img{
+        width: 40px;
+        height: 40px;;
+    }
+   div.media-body p{
+       white-space: nowrap;
+       overflow: hidden;
+       text-overflow: ellipsis;
+   }
+</style>
 <div class="container">
-  主页
+    <h1><%=title%></h1>
+  <%
+   articles.forEach(function (art) {
+    %>
+  <div class="media">
+    <a class="media-left" href="#">
+      <img src="<%=art.user.avatar %>" id="img" alt=""/>
+    </a>
+    <div class="media-body">
+      <h4 class="media-heading"><a href="/article/detail/<%=art._id%>" ><%=art.title%></a>  </h4>
+       <%-art.content%>
+    </div>
+      <div class="media-bottom">
+          作者:<%=art.user.username%><br/>
+          发表时间:<%=art.createAt.toLocaleString()%><br/><br/>
+      </div>
+  </div>
+  <% }); %>
+
+    <ul class="pagination">
+        <%
+        var totalPage = Math.ceil(count/pageSize);
+        if(pageNum!=1){
+        %>
+        <li ><a href="/list/<%=pageNum-1%>/<%=pageSize%>">&laquo;</a></li>
+        <%
+        }else{
+            %>
+        <li ><span>&laquo;</span></li>
+        <%
+        }
+         %>
+        <%
+        for(var i=1;i<=totalPage;i++){
+            if(i==pageNum){
+        %>
+        <li class="active"><a href="/list/<%=i%>/<%=pageSize%>"><%=i%></a></li>
+        <%
+        }
+        else{
+        %>
+        <li><a href="/list/<%=i%>/<%=pageSize%>"><%=i%></a></li>
+        <%
+        }
+        }
+        if(pageNum < totalPage){
+            %>
+        <li ><a href="/list/<%=pageNum+1%>/<%=pageSize%> %>">&raquo;</a></li>
+
+        <%
+        }else{
+            %>
+        <li ><span>&raquo;</span></li>
+        <%
+        }
+         %>
+
+    </ul>
+
+
 </div>
 <% include include/footer.ejs%>
 

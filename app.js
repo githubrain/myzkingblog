@@ -10,14 +10,42 @@ require("./db");
 var index = require('./routes/index');
 var users = require('./routes/users');
 var article = require('./routes/article');
+
+var settings = require('./settings');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+var flash = require('connect-flash');
+
 var app = express();
-
-
 
 //加载模板
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// 设置ejs的模板是html
+//app.set('view engine', 'html');
+//app.engine('html',require('ejs').__express);
+
+app.use(cookieParser());
+app.use(session({
+  secret: settings.cookieSecret,//secret 用来防止篡改 cookie
+  key: settings.db,//key 的值为 cookie 的名字
+  cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//设定 cookie 的生存期，这里我们设置 cookie 的生存期为 30 天
+  resave: true,
+  saveUninitialized:true,
+  store:new MongoStore({url:settings.url})
+}));
+
+app.use(flash());
+
+app.use(function (req,res,next) {
+  res.locals.user = req.session.user;
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  res.locals.keyword = req.session.keyword;
+  next();
+});
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -25,8 +53,8 @@ app.use(logger('dev'));
 //  设置表单格式  需要两种格式  json 和 urlencoded
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// 调用解析cookie和加载静态页面
-app.use(cookieParser());
+// 加载静态页面
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 //  设置路由处理模块  所有访问"/" 网站根目录的请求都由index路由模块处理
@@ -58,5 +86,4 @@ app.use(function(err, req, res, next) {
   // 渲染错误页面
   res.render('error');
 });
-
 module.exports = app;
