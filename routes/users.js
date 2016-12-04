@@ -72,10 +72,7 @@ router.post('/login', function (req, res) {
     if(doc){
       //登录成功后，将用户的信息放入session保存
       req.session.user=doc;
-      //重定向  是由服务器端向客户端浏览器发出状态是301/302的响应码  告诉客户端浏览器要发出新的请求，地址是“/”也就是网站的根目录
-      // A页面---> B页面--->C页面   地址会变
-      //  转发  forward
-      //  A页面--->B页面--->C页面   地址不会变  通过渲染
+
 
       //放入成功的消息
       req.flash("success","登录成功");

@@ -18,6 +18,8 @@ Article: { //设置文章的数据模型
     title: String, //标题
     content: String, //内容
     img:String,
-    createAt:{type: Date, default: Date.now}// 创建时间
+    createAt:{type: Date, default: Date.now},// 创建时间
+    comments: [{user:{type:ObjectId,ref:'User'}, content:String,createAt:{type: Date, default: Date.now}}],
+    pv: {type:Number,default:0}
 }
 };

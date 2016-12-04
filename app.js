@@ -6,7 +6,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 require("./db");
 // 加载路由文件   routes 文件夹专门存放路由文件
-// 这里的index实际上就是index里暴露出来的
 var index = require('./routes/index');
 var users = require('./routes/users');
 var article = require('./routes/article');
@@ -63,27 +62,15 @@ app.use('/', index);
 app.use('/users', users);
 
 // 所有的路由处理全部模块化  所有访问相同资源的请求都有同一个路由模块处理
-//  符合了RESTful的设计原则
+//  RESTful的设计原则
 // 负责处理文章的路由
 app.use('/article',article);
+
+
 // catch 404 and forward to error handler
 //  捕捉错误路由  生成错误对象
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  //  转到下一个中间件  做错误页面的渲染
-  next(err);
+  res.render("404");
 });
 
-// error handler  错误页面的渲染
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  // 渲染错误页面
-  res.render('error');
-});
 module.exports = app;

@@ -9,6 +9,7 @@ var utils = require("../utils");
 var markdown = require('markdown').markdown;
 var multer = require("multer");
 var path = require('path');
+var async = require('async');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -84,10 +85,21 @@ router.post('/add',auth.checkNotLogin, upload.single('img'),function (req, res) 
 });
 
 
+
 router.get('/detail/:_id', function (req, res) {
-    models.Article.findOne({_id:req.params._id}).populate("user").exec(function(err,article){
-        article.content = markdown.toHTML(article.content);
-        res.render('article/detail',{title:'查看文章',article:article});
+    async.parallel([function(callback){
+        models.Article.findOne({_id:req.params._id}).populate('user').populate('comments.user').exec(function(err,article){
+            article.content = markdown.toHTML(article.content);
+            callback(err,article);
+        });
+    },function(callback){
+        models.Article.update({_id:req.params._id},{$inc:{pv:1}},callback);
+    }],function(err,result){
+        if(err){
+            req.flash('error',err);
+            res.redirect('back');
+        }
+        res.render('article/detail',{title:'查看文章',article:result[0]});
     });
 });
 
@@ -120,7 +132,7 @@ router.all("/list/:pageNum/:pageSize", function (req,res,next) {
     //  如果点击的是搜索按钮，就会有搜索关键字，
     if(searchBtn)
     {
-        //   那么就把关键字放到session中，这样换页时，搜索关键字不会消失
+        //  就把关键字放到session中
         req.session.keyword = keyword;
     }
     if(req.session.keyword){
@@ -152,8 +164,17 @@ router.all("/list/:pageNum/:pageSize", function (req,res,next) {
 
 
 });
-
-router.get('/see', function (req, res) {
+router.post('/comment',auth.checkNotLogin, function (req, res) {
+    var user = req.session.user;
+    models.Article.update({_id:req.body._id},{$push:{comments:{user:user._id,content:req.body.content}}},function(err,result){
+        if(err){
+            req.flash('error',err);
+            return res.redirect('back');
+        }
+        req.flash('success', '评论成功!');
+        res.redirect('back');
+    });
 
 });
+
 module.exports = router;

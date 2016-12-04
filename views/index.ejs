@@ -26,6 +26,8 @@
       <div class="media-bottom">
           作者:<%=art.user.username%><br/>
           发表时间:<%=art.createAt.toLocaleString()%><br/><br/>
+          阅读：<%= art.pv %>|
+          评论：<%= art.comments.length%>
       </div>
   </div>
   <% }); %>
